@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LearnX Course Landing Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --hue: 34; /* orange/gold */
+      --primary: hsl(var(--hue), 85%, 55%);
+      --primary-light: hsl(var(--hue), 85%, 70%);
+      --primary-lighter: hsl(var(--hue), 85%, 95%);
+      --primary-dark: hsl(var(--hue), 85%, 38%);
+      --primary-darkest: hsl(var(--hue), 85%, 28%);
+      --accent: #5e60ce;
+      --text-main: #3a2e1a;
+      --text-muted: #8b7a5c;
+      --bg-main: #fdf6ed;
+      --card-bg: #fff;
+      --border-radius: 18px;
+      --transition: all 0.3s cubic-bezier(.4,1,.7,1);
+      --shadow: 0 2px 10px rgba(94,96,206,0.06);
+      --font-main: 'Segoe UI', 'Inter', Arial, sans-serif;
+    }
+    body {
+      font-family: var(--font-main);
+      background: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Loader (Horizontal Bar) */
+    .loader-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(60,48,32,0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 0.3s;
+    }
+    .loader {
+      width: 80%;
+      max-width: 420px;
+      height: 14px;
+      background: #f5e7d6;
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .loader-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 7px;
+      transition: width 0.3s;
+    }
+    .loader-percentage {
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      font-family: var(--font-main);
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--primary-darkest);
+      color: white;
+      box-shadow: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 22px;
+      border-radius: var(--border-radius);
+      margin-bottom: 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      max-width: 100%;
+      font-family: var(--font-main);
+    }
+    .navbar-brand {
+      font-size: 1.45rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: white;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .navbar-brand i {
+      font-size: 1.7rem;
+    }
+    .navbar-links {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      width: 100%;
+      min-width: 0;
+    }
+    .navbar-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.07rem;
+      transition: var(--transition);
+      padding: 7px 14px;
+      border-radius: 7px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      background: transparent;
+    }
+    .navbar-links a:hover{
+      color: var(--primary-darkest);
+      background: var(--primary-light);
+    }
+    .navbar-icon {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    @media (max-width: 900px) {
+      .navbar {
+        padding: 8px 4px;
+      }
+      .navbar-links {
+        gap: 6px;
+        font-size: 1rem;
+      }
+    }
+    @media (max-width: 700px) {
+      .navbar-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        background: var(--primary-darkest);
+        position: absolute;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        box-shadow: 0 4px 16px rgba(94,96,206,0.10);
+        padding: 10px 0;
+        display: none;
+      }
+      .navbar-links.show {
+        display: flex;
+      }
+      .navbar-icon {
+        display: block;
+      }
+    }
+
+    .main-content { display: none; padding-top: 12px; }
+
+    /* Hero / About Section */
+    .about-section {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border-radius: var(--border-radius);
+      padding: 36px 32px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow);
+      border: 1px solid #f5e7d6;
+      transition: background 0.3s, color 0.3s;
+      text-align: center;
+    }
+    .about-section h1 {
+      font-size: 2.2rem;
+      color: var(--primary-darkest);
+      margin-bottom: 18px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      transition: color 0.3s;
+    }
+    .about-section p {
+      font-size: 1.13rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+      transition: color 0.3s;
+    }
+    .theme-highlight {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 5px 15px;
+      border-radius: 30px;
+      font-weight: 600;
+      margin: 10px 0;
+      letter-spacing: 0.5px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .cta-btn {
+      display: inline-block;
+      margin-top: 16px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 1.09rem;
+      font-weight: 700;
+      padding: 13px 32px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(94,96,206,0.08);
+      transition: background 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .cta-btn:hover {
+      background: var(--accent);
+      color: var(--primary-darkest);
+    }
+
+    /* Stats Section */
+    .stats-section {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 28px 22px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow);
+      border: 1px solid #f5e7d6;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 26px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: var(--primary-lighter);
+      border-radius: var(--border-radius);
+      padding: 22px 18px;
+      box-shadow: none;
+      transition: var(--transition);
+      border: 1px solid #ffe9b0;
+      text-align: center;
+    }
+    .stat-card:hover {
+      background: var(--primary-light);
+      color: #fff;
+    }
+    .stat-icon {
+      font-size: 2.2rem;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+    .stat-title {
+      font-size: 1rem;
+      color: var(--primary-darkest);
+      margin-bottom: 7px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary-darkest);
+      margin-bottom: 7px;
+    }
+    .stat-unit {
+      font-size: 0.93rem;
+      color: var(--primary-dark);
+      margin-bottom: 11px;
+    }
+    .stat-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.93rem;
+      font-weight: 600;
+      justify-content: center;
+    }
+    .stat-change.positive {
+      color: #43e97b;
+    }
+    .stat-change.negative {
+      color: #ff5e62;
+    }
+
+    /* Chart Section */
+    .chart-section {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 28px 22px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow);
+      border: 1px solid #f5e7d6;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .chart-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-darkest);
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+    }
+    .chart-subtitle {
+      font-size: 0.93rem;
+      color: var(--primary-dark);
+      margin-top: 7px;
+    }
+    .chart-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-label {
+      font-size: 0.93rem;
+      color: var(--primary-darkest);
+      font-weight: 600;
+    }
+    .filter-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    .filter-btn {
+      padding: 7px 13px;
+      border: 1px solid var(--primary);
+      border-radius: 18px;
+      background: #fff;
+      font-size: 0.93rem;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--primary-darkest);
+      font-weight: 600;
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .chart-container {
+      height: 280px;
+      display: flex;
+      align-items: end;
+      gap: 7px;
+      padding: 14px 0;
+      border-bottom: 2px solid #ffe9b0;
+      position: relative;
+    }
+    .chart-bar {
+      background: var(--primary);
+      border-radius: 4px 4px 0 0;
+      min-width: 22px;
+      flex: 1;
+      position: relative;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .chart-bar:hover {
+      background: var(--primary-dark);
+    }
+    .chart-bar-value {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: var(--primary-darkest);
+    }
+
+    /* Carousel Section */
+    .carousel-section {
+      margin-bottom: 36px;
+    }
+    .carousel-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 28px;
+      color: var(--primary-darkest);
+    }
+    .carousel-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      border: 1px solid #f5e7d6;
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(.4,1,.7,1);
+    }
+    .carousel-slide {
+      min-width: 100%;
+      padding: 38px 22px;
+      text-align: center;
+      background: var(--accent);
+      color: #fff;
+    }
+    .carousel-slide h3 {
+      font-size: 1.5rem;
+      margin-bottom: 14px;
+    }
+    .carousel-slide p {
+      font-size: 1.05rem;
+      opacity: 0.92;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .carousel-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .carousel-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .carousel-dot.active {
+      background: var(--primary-dark);
+    }
+
+    /* Brand Kits Card */
+    .brand-kits-card {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 36px auto;
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      padding: 22px 12px;
+      gap: 12px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #f5e7d6;
+    }
+    .brand-heading {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 18px 0;
+      color: var(--primary-darkest);
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .brand-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-item {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 13px 10px;
+      border: 1px solid #ffe9b0;
+      transition: var(--transition);
+      cursor: pointer;
+      box-shadow: none;
+    }
+    .brand-item:hover {
+      background: var(--primary-lighter);
+    }
+    .brand-item.active {
+      border: 2px solid var(--accent);
+      background: var(--primary-lighter);
+    }
+    .brand-select {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      border: 2px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 13px;
+      transition: var(--transition);
+      position: relative;
+    }
+    .brand-item.active .brand-select {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .brand-item.active .brand-select::before {
+      content: '✓';
+      color: var(--primary-darkest);
+      font-weight: bold;
+      font-size: 15px;
+    }
+    .brand-icons {
+      display: flex;
+      gap: 4px;
+      margin-right: 10px;
+    }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .gold { background: #ffd166; }
+    .blue { background: #5e60ce; }
+    .green { background: #43e97b; }
+    .white { background: #fff; border: 1px solid #e0e0e0; }
+    .brand-name {
+      flex: 1;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary-darkest);
+    }
+    .brand-settings {
+      width: 24px;
+      height: 24px;
+      background: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23888" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09c0 .66.39 1.25 1 1.51a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c0 .66.39 1.25 1 1.51H21a2 2 0 1 1 0 4h-.09c-.66 0-1.25.39-1.51 1z"/></svg>');
+      background-size: 70%;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.7;
+    }
+
+    /* Customer Logos Section (at the end) */
+    .customers-section {
+      background: var(--primary);
+      border-radius: var(--border-radius);
+      padding: 36px 24px;
+      margin-bottom: 0;
+      text-align: center;
+      color: white;
+      box-shadow: var(--shadow);
+      border: 1px solid #f5e7d6;
+    }
+    .customers-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+      letter-spacing: 1px;
+    }
+    .customers-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 18px;
+    }
+    .company-logo {
+      font-size: 2.3rem;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary-darkest);
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(94,96,206,0.08);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .company-logo:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-5px) scale(1.08);
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 8px; }
+      .about-section, .stats-section, .chart-section, .customers-section, .carousel-slide { padding: 12px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 14px; }
+      .stat-value { font-size: 1.5rem; }
+      .chart-header { flex-direction: column; gap: 12px; }
+      .chart-filters { width: 100%; }
+      .brand-kits-card { margin: 14px auto; padding: 12px 4px; }
+      .customers-grid { gap: 13px; }
+      .company-logo { font-size: 1.3rem; width: 36px; height: 36px; }
+    }
+    @media (max-width: 480px) {
+      .chart-container { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader (Horizontal Bar) -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader">
+      <div class="loader-bar" id="loaderBar"></div>
+    </div>
+    <div class="loader-percentage" id="loaderPercent">0%</div>
+  </div>
+
+  <div class="container">
+    <nav class="navbar">
+      <a href="#" class="navbar-brand"><i class="fas fa-graduation-cap"></i> LearnX</a>
+      <div class="navbar-links" id="navbarLinks">
+        <a href="#about" class="active">About</a>
+        <a href="#stats">Stats</a>
+        <a href="#curriculum">Curriculum</a>
+        <a href="#review">Review</a>
+        <a href="#plans">Plans</a>
+        <a href="#partners">Partners</a>
+      </div>
+      <div class="navbar-icon" id="navbarIcon">
+        <i class="fas fa-bars"></i>
+      </div>
+    </nav>
+
+    <div class="main-content" id="mainContent">
+      <!-- Hero / About Section -->
+      <section class="about-section" id="about">
+        <h1>Master Modern Web Development</h1>
+        <p>Join <strong>LearnX</strong> and unlock your future in tech. Our immersive online course takes you from beginner to job-ready with real-world projects, expert mentors, and a supportive community.</p>
+        <p><span class="theme-highlight"><i class="fas fa-bolt"></i> Enroll now and get lifetime access!</span></p>
+        <a href="#plans" class="cta-btn">Get Started</a>
+      </section>
+
+      <!-- Stats Section -->
+      <section class="stats-section" id="stats">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-title">Students Enrolled</div>
+            <div class="stat-value">8,500+</div>
+            <div class="stat-unit">worldwide</div>
+            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> 21% this year</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+            <div class="stat-title">Lessons</div>
+            <div class="stat-value">120+</div>
+            <div class="stat-unit">video modules</div>
+            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> New content weekly</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-certificate"></i></div>
+            <div class="stat-title">Graduation Rate</div>
+            <div class="stat-value">92%</div>
+            <div class="stat-unit">certified</div>
+            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> 5% higher than avg.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chart Section -->
+      <section class="chart-section" id="curriculum">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Module Completion Rates</h2>
+            <p class="chart-subtitle">Average % completed by students</p>
+          </div>
+          <div class="chart-filters">
+            <div class="filter-group">
+              <label class="filter-label">Track</label>
+              <div class="filter-buttons">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Frontend</button>
+                <button class="filter-btn">Backend</button>
+                <button class="filter-btn">Fullstack</button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Sort</label>
+              <div class="filter-buttons">
+                <button class="filter-btn active">By Completion</button>
+                <button class="filter-btn">By Difficulty</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container" id="chartContainer">
+          <div class="chart-bar" style="height: 95%"><div class="chart-bar-value">HTML</div></div>
+          <div class="chart-bar" style="height: 92%"><div class="chart-bar-value">CSS</div></div>
+          <div class="chart-bar" style="height: 88%"><div class="chart-bar-value">JS</div></div>
+          <div class="chart-bar" style="height: 80%"><div class="chart-bar-value">React</div></div>
+          <div class="chart-bar" style="height: 70%"><div class="chart-bar-value">Node</div></div>
+          <div class="chart-bar" style="height: 60%"><div class="chart-bar-value">APIs</div></div>
+          <div class="chart-bar" style="height: 55%"><div class="chart-bar-value">Testing</div></div>
+        </div>
+      </section>
+
+      <!-- Carousel Section -->
+      <section class="carousel-section" id="testimonials">
+        <h2 class="carousel-title">What Our Students Say</h2>
+        <div class="carousel-container">
+          <div class="carousel-track" id="carouselTrack">
+            <div class="carousel-slide">
+              <h3><i class="fas fa-user-graduate"></i> Priya S.</h3>
+              <p>"LearnX was a game-changer. The hands-on projects and mentor feedback helped me land my first developer job!"</p>
+            </div>
+            <div class="carousel-slide">
+              <h3><i class="fas fa-user-graduate"></i> Alex M.</h3>
+              <p>"I loved the community and the real-world curriculum. I went from zero coding to building my own apps."</p>
+            </div>
+            <div class="carousel-slide">
+              <h3><i class="fas fa-user-graduate"></i> Jordan K.</h3>
+              <p>"The course is well-structured and up-to-date. The interactive lessons made learning fun and effective."</p>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-controls" id="carouselControls">
+          <button class="carousel-dot active" data-slide="0"></button>
+          <button class="carousel-dot" data-slide="1"></button>
+          <button class="carousel-dot" data-slide="2"></button>
+        </div>
+      </section>
+
+      <!-- Brand Kits Card -->
+      <section id="plans">
+        <div class="brand-kits-card">
+          <div class="brand-heading">Course Plans</div>
+          <div class="brand-list">
+            <div class="brand-item" data-brand="Starter">
+              <span class="brand-select"></span>
+              <span class="brand-icons">
+                <span class="dot gold"></span>
+                <span class="dot white"></span>
+              </span>
+              <span class="brand-name">Starter</span>
+              <span class="brand-settings"></span>
+            </div>
+            <div class="brand-item" data-brand="Pro">
+              <span class="brand-select"></span>
+              <span class="brand-icons">
+                <span class="dot blue"></span>
+                <span class="dot white"></span>
+              </span>
+              <span class="brand-name">Pro</span>
+              <span class="brand-settings"></span>
+            </div>
+            <div class="brand-item active" data-brand="Ultimate">
+              <span class="brand-select"></span>
+              <span class="brand-icons">
+                <span class="dot green"></span>
+                <span class="dot gold"></span>
+                <span class="dot white"></span>
+              </span>
+              <span class="brand-name">Ultimate</span>
+              <span class="brand-settings"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Company Logos Section (at the end) -->
+      <section class="customers-section" id="partners">
+        <h2 class="customers-title">Our Alumni Work At</h2>
+        <div class="customers-grid">
+          <span class="company-logo" title="Google"><i class="fab fa-google"></i></span>
+          <span class="company-logo" title="Microsoft"><i class="fab fa-microsoft"></i></span>
+          <span class="company-logo" title="Amazon"><i class="fab fa-amazon"></i></span>
+          <span class="company-logo" title="Facebook"><i class="fab fa-facebook-f"></i></span>
+          <span class="company-logo" title="Apple"><i class="fab fa-apple"></i></span>
+          <span class="company-logo" title="Slack"><i class="fab fa-slack"></i></span>
+          <span class="company-logo" title="Github"><i class="fab fa-github"></i></span>
+          <span class="company-logo" title="Dropbox"><i class="fab fa-dropbox"></i></span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Loader with horizontal bar and percentage
+    let percent = 0;
+    let loaderBar = document.getElementById('loaderBar');
+    let loaderPercent = document.getElementById('loaderPercent');
+    let loaderOverlay = document.getElementById('loaderOverlay');
+    let mainContent = document.getElementById('mainContent');
+    let interval = setInterval(() => {
+      percent += Math.floor(Math.random() * 7) + 2;
+      if (percent > 100) percent = 100;
+      loaderBar.style.width = percent + '%';
+      loaderPercent.textContent = percent + "%";
+      if (percent === 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          loaderOverlay.style.opacity = '0';
+          setTimeout(() => {
+            loaderOverlay.style.display = 'none';
+            mainContent.style.display = 'block';
+          }, 350);
+        }, 400);
+      }
+    }, 40);
+
+    // Animate stats bars
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(bar => {
+        let w = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => { bar.style.width = w; }, 50);
+      });
+    }, 700);
+
+    // Brand selection functionality
+    document.querySelectorAll('.brand-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.brand-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.filter-buttons').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Carousel functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const track = document.getElementById('carouselTrack');
+
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentSlide * 100}%)`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+    }
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        currentSlide = index;
+        updateCarousel();
+      });
+    });
+
+    // Auto-advance carousel
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      updateCarousel();
+    }, 5000);
+
+    // Chart bar hover effects
+    document.querySelectorAll('.chart-bar').forEach(bar => {
+      bar.addEventListener('mouseenter', function() {
+        this.style.transform = 'scaleY(1.05)';
+      });
+      bar.addEventListener('mouseleave', function() {
+        this.style.transform = 'scaleY(1)';
+      });
+    });
+
+    // Responsive Navbar
+    document.getElementById('navbarIcon').addEventListener('click', function() {
+      document.getElementById('navbarLinks').classList.toggle('show');
+    });
+
+    // Responsive handling
+    function handleResize() {
+      updateCarousel();
+    }
+    window.addEventListener('resize', handleResize);
+  </script>
+</body>
+</html>
